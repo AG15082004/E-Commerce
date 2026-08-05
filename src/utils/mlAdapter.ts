@@ -315,18 +315,19 @@ export async function loadMLData(force = false): Promise<MLCache> {
     // 1. customer_360 used for customer segments (profile-based segmentation)
     const segOp = await session.executeStatement(
       `SELECT 
-        c.customer_id, 
-        c.customer_name, 
-        c.customer_profile as segment_raw, 
-        c.total_revenue, 
-        c.total_orders,
-        c.avg_order_value, 
-        c.purchase_frequency_per_year as purchase_frequency, 
-        c.state, 
-        c.city
-       FROM e_com.gold.customer_360 c
-       ORDER BY c.total_revenue DESC
-       LIMIT 10000`,
+        customer_id, 
+        MAX(customer_name) as customer_name, 
+        MAX(customer_profile) as segment_raw, 
+        MAX(total_revenue) as total_revenue, 
+        MAX(total_orders) as total_orders,
+        MAX(avg_order_value) as avg_order_value, 
+        MAX(purchase_frequency_per_year) as purchase_frequency, 
+        MAX(state) as state, 
+        MAX(city) as city
+       FROM e_com.gold.customer_360
+       GROUP BY customer_id
+       ORDER BY total_revenue DESC
+       LIMIT 100000`,
       OPTS
     )
     const segRowsRaw = await fetchAllChunks(segOp)
@@ -368,9 +369,13 @@ export async function loadMLData(force = false): Promise<MLCache> {
         c.state, 
         c.city
        FROM e_com.ml.churn_predictions ch
-       LEFT JOIN e_com.gold.customer_360 c ON ch.customer_id = c.customer_id
+       LEFT JOIN (
+         SELECT customer_id, MAX(state) as state, MAX(city) as city 
+         FROM e_com.gold.customer_360 
+         GROUP BY customer_id
+       ) c ON ch.customer_id = c.customer_id
        ORDER BY ch.churn_probability DESC
-       LIMIT 10000`,
+       LIMIT 100000`,
       OPTS
     )
     const churnRowsRaw = await fetchAllChunks(churnOp)
@@ -407,9 +412,13 @@ export async function loadMLData(force = false): Promise<MLCache> {
         c.state, 
         c.city
        FROM e_com.ml.clv_predictions cl
-       LEFT JOIN e_com.gold.customer_360 c ON cl.customer_id = c.customer_id
+       LEFT JOIN (
+         SELECT customer_id, MAX(state) as state, MAX(city) as city 
+         FROM e_com.gold.customer_360 
+         GROUP BY customer_id
+       ) c ON cl.customer_id = c.customer_id
        ORDER BY cl.predicted_clv_12m DESC
-       LIMIT 10000`,
+       LIMIT 100000`,
       OPTS
     )
     const clvRowsRaw = await fetchAllChunks(clvOp)

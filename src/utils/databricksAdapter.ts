@@ -1,5 +1,5 @@
 import { DBSQLClient } from "@databricks/sql"
-import { updateAnalyticsCache } from "./analyticsEngine"
+import { updateAnalyticsCache, updateLifetimeTotals } from "./analyticsEngine"
 
 const DATABRICKS_CONFIG = {
   host: "dbc-76c64d67-a588.cloud.databricks.com",
@@ -141,6 +141,41 @@ export async function loadAllDatabricksData(): Promise<boolean> {
     const clickstreamRows = await fetchAllChunks(clickstreamOp)
     await clickstreamOp.close()
     console.log(`[Databricks Adapter] clickstream_summary: ${clickstreamRows.length} rows`)
+
+    // 8. Cumulative Lifetime Totals
+    console.log("[Databricks Adapter] Querying cumulative lifetime totals...")
+    let totalsRows: any[] = []
+    try {
+      const totalsOp = await session.executeStatement(
+        `SELECT 
+          (SELECT COUNT(DISTINCT order_id) FROM e_com.gold.sales_summary) AS total_orders,
+          (SELECT SUM(revenue) FROM e_com.gold.sales_summary) AS total_revenue,
+          (SELECT SUM(profit_amount) FROM e_com.gold.sales_summary) AS total_profit,
+          (SELECT COUNT(DISTINCT customer_id) FROM e_com.gold.customer_360) AS total_customers`,
+        OPTS
+      )
+      totalsRows = await fetchAllChunks(totalsOp)
+      await totalsOp.close()
+      if (totalsRows.length > 0) {
+        const row = totalsRows[0]
+        const tr = Number(row.total_revenue || 0)
+        const tp = Number(row.total_profit || 0)
+        const to = Number(row.total_orders || 0)
+        const tc = Number(row.total_customers || 0)
+        updateLifetimeTotals({
+          totalRevenue: tr,
+          totalProfit: tp,
+          orderCount: to,
+          totalCustomers: tc,
+          avgOrderValue: to > 0 ? tr / to : 0,
+          profitMargin: tr > 0 ? (tp / tr) * 100 : 0,
+          activeCustomers: tc
+        })
+        console.log(`[Databricks Adapter] Lifetime totals updated from DB: Orders=${to}, Customers=${tc}, Revenue=${tr}`)
+      }
+    } catch (err: any) {
+      console.log(`[Databricks Adapter] Failed to load lifetime totals, falling back to static metadata. Error: ${err.message}`)
+    }
 
     await session.close()
     await clientInstance.close()

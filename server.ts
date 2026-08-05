@@ -3,6 +3,7 @@ import cors from "cors"
 import { getAnalyticsData } from "./src/utils/analyticsEngine"
 import { loadAllDatabricksData, seedMockAnalyticsData } from "./src/utils/databricksAdapter"
 import { loadMLData } from "./src/utils/mlAdapter"
+import { executeSQL } from "./src/server/services/databricksConnector"
 
 const app = express()
 app.use(cors())
@@ -60,6 +61,67 @@ ensureDataLoaded().then(success => {
   }
 })
 
+async function fetchDynamicTotals(start: string, end: string, filters: any) {
+  let query = `
+    SELECT 
+      COUNT(DISTINCT order_id) AS total_orders,
+      COUNT(DISTINCT customer_id) AS total_customers,
+      SUM(revenue) AS total_revenue,
+      SUM(profit_amount) AS total_profit,
+      SUM(quantity) AS total_quantity
+    FROM e_com.gold.sales_summary
+    WHERE 1=1
+  `;
+
+  const isAllTime = start === "All" || end === "All";
+  if (!isAllTime) {
+    query += ` AND order_date >= '${start}' AND order_date <= '${end}'`;
+  }
+  if (filters.state && filters.state !== "All") {
+    query += ` AND state = '${filters.state}'`;
+  }
+  if (filters.city && filters.city !== "All") {
+    query += ` AND city = '${filters.city}'`;
+  }
+  if (filters.category && filters.category !== "All") {
+    query += ` AND product_category = '${filters.category}'`;
+  }
+  if (filters.brand && filters.brand !== "All") {
+    query += ` AND brand = '${filters.brand}'`;
+  }
+  if (filters.status && filters.status !== "All") {
+    query += ` AND order_status = '${filters.status}'`;
+  }
+  if (filters.warehouse && filters.warehouse !== "All") {
+    query += ` AND warehouse = '${filters.warehouse}'`;
+  }
+  if (filters.paymentMethod && filters.paymentMethod !== "All") {
+    query += ` AND payment_method = '${filters.paymentMethod}'`;
+  }
+
+  const res = await executeSQL(query);
+  if (res && res.rows && res.rows.length > 0) {
+    const row = res.rows[0];
+    const tr = Number(row.total_revenue || 0);
+    const tp = Number(row.total_profit || 0);
+    const to = Number(row.total_orders || 0);
+    const tc = Number(row.total_customers || 0);
+    const tq = Number(row.total_quantity || 0);
+
+    return {
+      totalRevenue: tr,
+      totalProfit: tp,
+      orderCount: to,
+      totalCustomers: tc,
+      avgOrderValue: to > 0 ? tr / to : 0,
+      profitMargin: tr > 0 ? (tp / tr) * 100 : 0,
+      activeCustomers: tc,
+      totalProductsSold: tq
+    };
+  }
+  return null;
+}
+
 app.get("/api/analytics", async (req, res) => {
   const params = req.query as any
   const start = params.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
@@ -71,8 +133,17 @@ app.get("/api/analytics", async (req, res) => {
   // Attempt to reload from Databricks if forced or stale
   await ensureDataLoaded(forceRefresh)
 
-  // Always respond — either with live Databricks data or mock fallback
-  const dashboardData = getAnalyticsData(start, end, params)
+  // 1. Fetch dynamic, database-wide totals matching the active filters
+  let dbTotals = null
+  try {
+    dbTotals = await fetchDynamicTotals(start, end, params)
+    console.log(`[API] Successfully retrieved dynamic DB totals:`, dbTotals)
+  } catch (err: any) {
+    console.error(`[API] Failed to fetch dynamic database totals, falling back:`, err.message)
+  }
+
+  // 2. Respond — compiler combines sample charts with true dynamic dbTotals overrides
+  const dashboardData = getAnalyticsData(start, end, params, dbTotals)
   res.json(dashboardData)
 })
 

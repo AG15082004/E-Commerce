@@ -164,7 +164,9 @@ Rules for SQL Generation:
 4. For text matches, use case-insensitive matching where appropriate (e.g., lower(state) = 'karnataka') or standard SQL queries.
 5. In your SQL, write SELECT statements only. Never generate destructive statements (DDL/DML like INSERT, DELETE, UPDATE, DROP).
 6. Always end your queries with a semicolon.
-7. Return your response in a strict JSON format with this exact structure:
+7. For counting orders in e_com.gold.sales_summary, ALWAYS use COUNT(DISTINCT order_id) instead of COUNT(order_id) or COUNT(*) because order_id has duplicate rows (representing multiple items per order checkout). Similarly, for counting total customers, ALWAYS use COUNT(DISTINCT customer_id).
+8. The date/timestamp columns (like order_date, registration_date, last_purchase_date) in the database contain time information. When comparing them against date strings (e.g., '2026-08-05') or date functions (e.g., CURRENT_DATE, DATE_SUB), ALWAYS wrap the column in to_date() or CAST(column AS date) (e.g. to_date(order_date) = CURRENT_DATE or CAST(order_date AS date) = DATE_SUB(CURRENT_DATE, 1)) to ensure non-midnight times are matched correctly.
+9. Return your response in a strict JSON format with this exact structure:
 {
   "sql": "SELECT ...",
   "explanation": "Brief explanation of what the query calculates and which tables it reads.",

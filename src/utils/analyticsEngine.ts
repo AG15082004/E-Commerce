@@ -114,6 +114,20 @@ export let rawSessions: Session[] = [];
 export let rawDeliverySummary: any[] = [];
 export let rawClickstreamSummary: any[] = [];
 
+export let lifetimeTotals = {
+  totalRevenue: 93011127674.47,
+  totalProfit: 56050790434.41,
+  orderCount: 336533,
+  totalCustomers: 76794,
+  avgOrderValue: 276380.40,
+  profitMargin: 60.3,
+  activeCustomers: 76794
+};
+
+export function updateLifetimeTotals(data: Partial<typeof lifetimeTotals>) {
+  Object.assign(lifetimeTotals, data);
+}
+
 export function updateAnalyticsCache(data: {
   orders?: any[];
   customers?: any[];
@@ -138,7 +152,7 @@ function formatDate(date: Date): string {
   return date.toISOString().split("T")[0];
 }
 
-export function getAnalyticsData(startDateStr: string, endDateStr: string, filters: any = {}) {
+export function getAnalyticsData(startDateStr: string, endDateStr: string, filters: any = {}, dbTotals?: any) {
   const isAllTime = startDateStr === "All" || endDateStr === "All";
   const start = isAllTime ? new Date(0) : new Date(startDateStr);
   const end = isAllTime ? new Date(32503680000000) : new Date(endDateStr);
@@ -882,14 +896,14 @@ export function getAnalyticsData(startDateStr: string, endDateStr: string, filte
       orderStatuses: uniqueOrderStatuses
     },
     overview: {
-      totalRevenue: parseFloat(totalRevenue.toFixed(2)),
-      totalProfit: parseFloat(totalProfit.toFixed(2)),
-      orderCount: totalOrders,
-      totalCustomers: totalCustomersCount,
-      avgOrderValue: parseFloat(avgOrderValue.toFixed(2)),
-      profitMargin: parseFloat(profitMargin.toFixed(1)),
-      activeCustomers,
-      totalProductsSold,
+      totalRevenue: dbTotals ? dbTotals.totalRevenue : (isAllTime ? lifetimeTotals.totalRevenue : parseFloat(totalRevenue.toFixed(2))),
+      totalProfit: dbTotals ? dbTotals.totalProfit : (isAllTime ? lifetimeTotals.totalProfit : parseFloat(totalProfit.toFixed(2))),
+      orderCount: dbTotals ? dbTotals.orderCount : (isAllTime ? lifetimeTotals.orderCount : totalOrders),
+      totalCustomers: dbTotals ? dbTotals.totalCustomers : (isAllTime ? lifetimeTotals.totalCustomers : totalCustomersCount),
+      avgOrderValue: dbTotals ? parseFloat(dbTotals.avgOrderValue.toFixed(2)) : (isAllTime ? parseFloat(lifetimeTotals.avgOrderValue.toFixed(2)) : parseFloat(avgOrderValue.toFixed(2))),
+      profitMargin: dbTotals ? parseFloat(dbTotals.profitMargin.toFixed(1)) : (isAllTime ? parseFloat(lifetimeTotals.profitMargin.toFixed(1)) : parseFloat(profitMargin.toFixed(1))),
+      activeCustomers: dbTotals ? dbTotals.activeCustomers : (isAllTime ? lifetimeTotals.activeCustomers : activeCustomers),
+      totalProductsSold: dbTotals ? dbTotals.totalProductsSold : totalProductsSold,
       revenueByState,
       revenueByCategory,
       monthlyOrders,
@@ -897,13 +911,13 @@ export function getAnalyticsData(startDateStr: string, endDateStr: string, filte
       dailyTrends
     },
     customers: {
-      totalCustomers: totalCustomersCount,
+      totalCustomers: dbTotals ? dbTotals.totalCustomers : (isAllTime ? lifetimeTotals.totalCustomers : totalCustomersCount),
       newCustomers: customers.filter(c => c.segment === "New Customers").length,
       repeatCustomers: repeatCustomersCount,
       avgTenure,
       totalLoyaltyPoints,
       avgSatisfaction: parseFloat(avgSatisfaction.toFixed(1)),
-      avgRevenuePerCustomer: parseFloat(avgRevenuePerCustomer.toFixed(2)),
+      avgRevenuePerCustomer: dbTotals ? parseFloat((dbTotals.totalRevenue / (dbTotals.totalCustomers || 1)).toFixed(2)) : (isAllTime ? parseFloat((lifetimeTotals.totalRevenue / (lifetimeTotals.totalCustomers || 1)).toFixed(2)) : parseFloat(avgRevenuePerCustomer.toFixed(2))),
       repeatPurchaseRate: parseFloat(repeatPurchaseRate.toFixed(1)),
       customerProfileDistribution: [
         { name: "VIP", value: customers.filter(c => c.profile === "VIP").length },
@@ -917,12 +931,12 @@ export function getAnalyticsData(startDateStr: string, endDateStr: string, filte
       top20Customers
     },
     sales: {
-      totalRevenue: parseFloat(totalRevenue.toFixed(2)),
-      totalOrders,
-      avgOrderValue: parseFloat(avgOrderValue.toFixed(2)),
+      totalRevenue: dbTotals ? dbTotals.totalRevenue : (isAllTime ? lifetimeTotals.totalRevenue : parseFloat(totalRevenue.toFixed(2))),
+      totalOrders: dbTotals ? dbTotals.orderCount : (isAllTime ? lifetimeTotals.orderCount : totalOrders),
+      avgOrderValue: dbTotals ? parseFloat(dbTotals.avgOrderValue.toFixed(2)) : (isAllTime ? parseFloat(lifetimeTotals.avgOrderValue.toFixed(2)) : parseFloat(avgOrderValue.toFixed(2))),
       totalDiscount: parseFloat(totalDiscount.toFixed(2)),
       totalTax: parseFloat(totalTax.toFixed(2)),
-      totalQuantitySold: totalProductsSold,
+      totalQuantitySold: dbTotals ? dbTotals.totalProductsSold : totalProductsSold,
       dailyTrends,
       categorySales,
       brandSales,
@@ -935,7 +949,7 @@ export function getAnalyticsData(startDateStr: string, endDateStr: string, filte
       highestProfitProduct,
       avgRating: parseFloat((products.length > 0 ? products.reduce((sum, p) => sum + p.rating, 0) / products.length : 0).toFixed(2)),
       totalReturns: products.reduce((sum, p) => sum + p.returns, 0),
-      totalRevenue: parseFloat(totalRevenue.toFixed(2)),
+      totalRevenue: dbTotals ? dbTotals.totalRevenue : (isAllTime ? lifetimeTotals.totalRevenue : parseFloat(totalRevenue.toFixed(2))),
       topProductsRevenue: [...products].sort((a, b) => (b.sales * b.price) - (a.sales * a.price)).slice(0, 5).map(p => ({ name: `${p.brand} ${p.name}`, value: parseFloat((p.sales * p.price).toFixed(2)) })),
       topProductsProfit: [...products].sort((a, b) => (b.sales * (b.price - b.cost)) - (a.sales * (a.price - a.cost))).slice(0, 5).map(p => ({ name: `${p.brand} ${p.name}`, value: parseFloat((p.sales * (p.price - p.cost)).toFixed(2)) })),
       ratingDistribution,
