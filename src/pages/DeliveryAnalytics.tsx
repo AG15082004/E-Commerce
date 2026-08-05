@@ -32,6 +32,26 @@ import {
   BookOpen,
 } from "lucide-react"
 
+const renderCustomPieLabel = ({ cx, cy, midAngle, outerRadius, percent, name, fill }: any) => {
+  const RADIAN = Math.PI / 180
+  const radius = outerRadius + 14
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+  return (
+    <text
+      x={x}
+      y={y}
+      fill={fill}
+      fontSize={9}
+      fontWeight={700}
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+    >
+      {`${name}: ${percent ? (percent * 100).toFixed(1) : "0.0"}%`}
+    </text>
+  )
+}
+
 export const DeliveryAnalytics: React.FC = () => {
   // Local filter states
   const [startDate, setStartDate] = useState<string>(() => {
@@ -272,6 +292,8 @@ export const DeliveryAnalytics: React.FC = () => {
                         outerRadius={85}
                         paddingAngle={3}
                         dataKey="value"
+                        label={renderCustomPieLabel}
+                        labelLine={false}
                       >
                         {data.delivery.deliveryStatusDistribution.map((_: any, index: number) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -286,8 +308,8 @@ export const DeliveryAnalytics: React.FC = () => {
             </Card>
           </div>
 
-          {/* Warehouse Delivery Days & Warehouse Failed Deliveries & Trends */}
-          <div className="grid gap-6 md:grid-cols-3">
+          {/* Warehouse Delivery Days & Trends */}
+          <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Avg Delivery Days by Warehouse</CardTitle>
@@ -302,26 +324,6 @@ export const DeliveryAnalytics: React.FC = () => {
                       <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}d`} />
                       <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155", borderRadius: "8px", color: "#f1f5f9" }} />
                       <Bar dataKey="days" fill="#2563EB" radius={[4, 4, 0, 0]} name="Transit Days" maxBarSize={30} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Failed Deliveries by Warehouse</CardTitle>
-                <CardDescription>Canceled dispatch cases.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[230px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data.delivery.warehouseDeliveries} margin={{ top: 10, right: 10, left: 15, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} tickLine={false} interval={0} />
-                      <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
-                      <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155", borderRadius: "8px", color: "#f1f5f9" }} />
-                      <Bar dataKey="failed" fill="#E11D48" radius={[4, 4, 0, 0]} name="Failed units" maxBarSize={30} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

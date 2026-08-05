@@ -16,10 +16,10 @@ export function useAnalytics(startDate: string, endDate: string, filters: any = 
       })
       return response.data
     },
-    staleTime: 0,           // Always treat data as stale → refetch from Databricks on every access
-    gcTime: 0,              // Don't keep old data in cache between navigations
-    refetchOnMount: true,   // Refetch whenever a page/component mounts
-    refetchOnWindowFocus: true, // Refetch when user returns to the tab
+    staleTime: 30000,         // Cache dashboard data for 30 seconds to make filtering instant
+    gcTime: 5 * 60 * 1000,    // Keep unused data in cache for 5 minutes
+    refetchOnMount: true,     // Refetch in background on mount if stale
+    refetchOnWindowFocus: false, // Don't trigger full reload on focus
     retry: 1,
   })
 }

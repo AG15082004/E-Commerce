@@ -34,6 +34,26 @@ import {
   BookOpen,
 } from "lucide-react"
 
+const renderCustomPieLabel = ({ cx, cy, midAngle, outerRadius, percent, name, fill }: any) => {
+  const RADIAN = Math.PI / 180
+  const radius = outerRadius + 14
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+  return (
+    <text
+      x={x}
+      y={y}
+      fill={fill}
+      fontSize={9}
+      fontWeight={700}
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+    >
+      {`${name}: ${percent ? (percent * 100).toFixed(1) : "0.0"}%`}
+    </text>
+  )
+}
+
 export const ExecutiveDashboard: React.FC = () => {
   // Local filter states
   const [startDate, setStartDate] = useState<string>(() => {
@@ -383,6 +403,8 @@ export const ExecutiveDashboard: React.FC = () => {
                         outerRadius={75}
                         paddingAngle={3}
                         dataKey="value"
+                        label={renderCustomPieLabel}
+                        labelLine={false}
                       >
                         {data.overview.revenueByCategory.map((_: any, index: number) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
