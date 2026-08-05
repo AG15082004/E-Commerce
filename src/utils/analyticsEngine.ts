@@ -402,9 +402,9 @@ export function getAnalyticsData(startDateStr: string, endDateStr: string, filte
   // --- 1. EXECUTIVE DASHBOARD DATA ---
   const totalRevenue = orders.reduce((sum, o) => sum + o.revenue, 0);
   const totalProfit = orders.reduce((sum, o) => sum + o.profit, 0);
-  const totalOrders = orders.reduce((sum, o) => sum + (o.ordersCount || 1), 0);
+  const totalOrders = new Set(orders.map(o => o.id)).size;
   const totalCustomersCount = customers.length;
-  const activeCustomers = rawCustomers.length > 50 ? rawCustomers.length : new Set(orders.map(o => o.customerId)).size;
+  const activeCustomers = new Set(orders.map(o => o.customerId)).size;
   const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
   const profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
   const totalProductsSold = orders.reduce((sum, o) => sum + o.quantity, 0);
