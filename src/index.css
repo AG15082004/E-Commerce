@@ -5,125 +5,155 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MICROSOFT FLUENT DESIGN SYSTEM — CSS VARIABLES
+   MICROSOFT FLUENT DESIGN SYSTEM — CSS VARIABLES----sample test-1
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
   /* === CORE FLUENT PALETTE === */
-  --color-fluent-blue:       #00A4EF;       /* Brand action / Selection */
-  --color-ice-blue:          #E1F5FE;       /* Active state tint / selection bg */
-  --color-fluent-gray:       #F3F2F1;       /* Main application background */
-  --color-neutral-gray:      #E1DFDD;       /* Borders and dividers */
-  --color-text-dark:         #242424;       /* High-contrast text */
-  --color-white:             #FFFFFF;       /* Surfaces and cards */
+  --color-fluent-blue: #00A4EF;
+  /* Brand action / Selection */
+  --color-ice-blue: #E1F5FE;
+  /* Active state tint / selection bg */
+  --color-fluent-gray: #F3F2F1;
+  /* Main application background */
+  --color-neutral-gray: #E1DFDD;
+  /* Borders and dividers */
+  --color-text-dark: #242424;
+  /* High-contrast text */
+  --color-white: #FFFFFF;
+  /* Surfaces and cards */
 
   /* === DESIGN TOKENS === */
-  --background:              210 16% 95%;   /* Maps to #F3F2F1 */
-  --foreground:              0 0% 14%;      /* Maps to #242424 */
-  --card:                    0 0% 100%;     /* White */
-  --card-foreground:         0 0% 14%;
-  --popover:                 0 0% 100%;
-  --popover-foreground:      0 0% 14%;
-  --primary:                 199 100% 47%;  /* #00A4EF */
-  --primary-foreground:      0 0% 100%;
-  --secondary:               199 100% 94%;  /* Ice Blue tint */
-  --secondary-foreground:    0 0% 14%;
-  --muted:                   210 10% 97%;
-  --muted-foreground:        0 0% 38%;
-  --accent:                  199 100% 47%;
-  --accent-foreground:       0 0% 100%;
-  --border:                  30 4% 88%;     /* Neutral Gray #E1DFDD */
-  --input:                   30 4% 88%;
-  --ring:                    199 100% 47%;
-  --radius:                  4px;           /* Fluent utilizes tighter corners */
+  --background: 210 16% 95%;
+  /* Maps to #F3F2F1 */
+  --foreground: 0 0% 14%;
+  /* Maps to #242424 */
+  --card: 0 0% 100%;
+  /* White */
+  --card-foreground: 0 0% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 14%;
+  --primary: 199 100% 47%;
+  /* #00A4EF */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 199 100% 94%;
+  /* Ice Blue tint */
+  --secondary-foreground: 0 0% 14%;
+  --muted: 210 10% 97%;
+  --muted-foreground: 0 0% 38%;
+  --accent: 199 100% 47%;
+  --accent-foreground: 0 0% 100%;
+  --border: 30 4% 88%;
+  /* Neutral Gray #E1DFDD */
+  --input: 30 4% 88%;
+  --ring: 199 100% 47%;
+  --radius: 4px;
+  /* Fluent utilizes tighter corners */
 
   /* === SIDEBAR / NAVBAR TOKENS === */
-  --sidebar-bg:              #FFFFFF;
-  --sidebar-bg-alt:          #F3F2F1;
-  --sidebar-active:          #00A4EF;
-  --sidebar-active-bg:       #E1F5FE;
-  --sidebar-text:            #242424;
-  --sidebar-text-muted:      #605E5C;
-  --sidebar-text-active:     #242424;
-  --sidebar-border:          #E1DFDD;
+  --sidebar-bg: #FFFFFF;
+  --sidebar-bg-alt: #F3F2F1;
+  --sidebar-active: #00A4EF;
+  --sidebar-active-bg: #E1F5FE;
+  --sidebar-text: #242424;
+  --sidebar-text-muted: #605E5C;
+  --sidebar-text-active: #242424;
+  --sidebar-border: #E1DFDD;
 
   /* === CHART TOKENS === */
-  --chart-cat-electronics:   #0078D4;
-  --chart-cat-fashion:       #00A4EF;
-  --chart-cat-home:          #00B7C3;
-  --chart-cat-beauty:        #87A9FF;
-  --chart-cat-sports:        #50E6FF;
-  --chart-cat-others:        #005A9E;
-  --chart-pay-upi:           #0078D4;
-  --chart-pay-credit:        #00A4EF;
-  --chart-pay-debit:         #00B7C3;
-  --chart-pay-netbanking:    #87A9FF;
-  --chart-pay-cod:           #50E6FF;
-  --chart-bar-positive:      #107C41;       /* Excel Green for positive values */
-  --chart-line:              #0078D4;
+  --chart-cat-electronics: #0078D4;
+  --chart-cat-fashion: #00A4EF;
+  --chart-cat-home: #00B7C3;
+  --chart-cat-beauty: #87A9FF;
+  --chart-cat-sports: #50E6FF;
+  --chart-cat-others: #005A9E;
+  --chart-pay-upi: #0078D4;
+  --chart-pay-credit: #00A4EF;
+  --chart-pay-debit: #00B7C3;
+  --chart-pay-netbanking: #87A9FF;
+  --chart-pay-cod: #50E6FF;
+  --chart-bar-positive: #107C41;
+  /* Excel Green for positive values */
+  --chart-line: #0078D4;
 
   /* === RECHARTS THEME-AWARE === */
-  --chart-text:              #323130;
-  --chart-grid:              #EDEBE9;
-  --chart-tooltip-bg:        #FFFFFF;
-  --chart-tooltip-border:    #D2D0CE;
-  --chart-tooltip-text:      #323130;
+  --chart-text: #323130;
+  --chart-grid: #EDEBE9;
+  --chart-tooltip-bg: #FFFFFF;
+  --chart-tooltip-border: #D2D0CE;
+  --chart-tooltip-text: #323130;
 }
 
 /* Premium Microsoft Fluent Dark Theme overrides */
 .dark {
   /* === CORE FLUENT PALETTE FOR DARK === */
-  --color-fluent-blue:       #00A4EF;       /* Keep vibrant Microsoft blue */
-  --color-ice-blue:          #2D2C2B;       /* Dark grey active state tint */
-  --color-fluent-gray:       #201F1E;       /* Main app dark background */
-  --color-neutral-gray:      #3B3A39;       /* Borders and dividers */
-  --color-text-dark:         #F3F2F1;       /* Light grey/off-white text */
-  --color-white:             #252423;       /* Surface/cards background */
+  --color-fluent-blue: #00A4EF;
+  /* Keep vibrant Microsoft blue */
+  --color-ice-blue: #2D2C2B;
+  /* Dark grey active state tint */
+  --color-fluent-gray: #201F1E;
+  /* Main app dark background */
+  --color-neutral-gray: #3B3A39;
+  /* Borders and dividers */
+  --color-text-dark: #F3F2F1;
+  /* Light grey/off-white text */
+  --color-white: #252423;
+  /* Surface/cards background */
 
   /* === DESIGN TOKENS === */
-  --background:              0 0% 12%;      /* #201F1E */
-  --foreground:              0 0% 95%;      /* #F3F2F1 */
-  --card:                    0 0% 14%;      /* #252423 */
-  --card-foreground:         0 0% 95%;
-  --popover:                 0 0% 14%;
-  --popover-foreground:      0 0% 95%;
-  --primary:                 199 100% 47%;  /* #00A4EF */
-  --primary-foreground:      0 0% 100%;
-  --secondary:               0 0% 18%;      /* Dark active */
-  --secondary-foreground:    0 0% 95%;
-  --muted:                   0 0% 18%;
-  --muted-foreground:        0 0% 70%;
-  --accent:                  199 100% 47%;
-  --accent-foreground:       0 0% 100%;
-  --border:                  0 0% 23%;      /* #3B3A39 */
-  --input:                   0 0% 23%;
-  --ring:                    199 100% 47%;
+  --background: 0 0% 12%;
+  /* #201F1E */
+  --foreground: 0 0% 95%;
+  /* #F3F2F1 */
+  --card: 0 0% 14%;
+  /* #252423 */
+  --card-foreground: 0 0% 95%;
+  --popover: 0 0% 14%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 199 100% 47%;
+  /* #00A4EF */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 18%;
+  /* Dark active */
+  --secondary-foreground: 0 0% 95%;
+  --muted: 0 0% 18%;
+  --muted-foreground: 0 0% 70%;
+  --accent: 199 100% 47%;
+  --accent-foreground: 0 0% 100%;
+  --border: 0 0% 23%;
+  /* #3B3A39 */
+  --input: 0 0% 23%;
+  --ring: 199 100% 47%;
 
   /* === SIDEBAR / NAVBAR TOKENS === */
-  --sidebar-bg:              #252423;
-  --sidebar-bg-alt:          #201F1E;
-  --sidebar-active:          #00A4EF;
-  --sidebar-active-bg:       #2D2C2B;
-  --sidebar-text:            #F3F2F1;
-  --sidebar-text-muted:      #A19F9D;
-  --sidebar-text-active:     #FFFFFF;
-  --sidebar-border:          #3B3A39;
+  --sidebar-bg: #252423;
+  --sidebar-bg-alt: #201F1E;
+  --sidebar-active: #00A4EF;
+  --sidebar-active-bg: #2D2C2B;
+  --sidebar-text: #F3F2F1;
+  --sidebar-text-muted: #A19F9D;
+  --sidebar-text-active: #FFFFFF;
+  --sidebar-border: #3B3A39;
 
   /* === CHART OVERRIDES IN DARK === */
-  --chart-text:              #A19F9D;
-  --chart-grid:              #2D2C2B;
-  --chart-tooltip-bg:        #252423;
-  --chart-tooltip-border:    #3B3A39;
-  --chart-tooltip-text:      #F3F2F1;
+  --chart-text: #A19F9D;
+  --chart-grid: #2D2C2B;
+  --chart-tooltip-bg: #252423;
+  --chart-tooltip-border: #3B3A39;
+  --chart-tooltip-text: #F3F2F1;
 }
 
 /* ─── BASE RESET ──────────────────────────────────────────────────────────── */
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  background-color: #F3F2F1;     /* Fluent Light Gray backdrop */
-  color: #242424;                /* Deep Dark Gray text */
+  background-color: #F3F2F1;
+  /* Fluent Light Gray backdrop */
+  color: #242424;
+  /* Deep Dark Gray text */
   font-family: "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -145,24 +175,44 @@ body {
 }
 
 /* ─── TYPOGRAPHY HIERARCHY ────────────────────────────────────────────────── */
-h1, h2, h3, .heading-bold {
-  font-weight: 700;              /* Bold */
+h1,
+h2,
+h3,
+.heading-bold {
+  font-weight: 700;
+  /* Bold */
   color: #242424;
 }
-.dark h1, .dark h2, .dark h3, .dark .heading-bold {
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark .heading-bold {
   color: #F3F2F1;
 }
 
-h4, h5, h6, .subheading-semibold {
-  font-weight: 600;              /* Semi-Bold */
+h4,
+h5,
+h6,
+.subheading-semibold {
+  font-weight: 600;
+  /* Semi-Bold */
   color: #242424;
 }
-.dark h4, .dark h5, .dark h6, .dark .subheading-semibold {
+
+.dark h4,
+.dark h5,
+.dark h6,
+.dark .subheading-semibold {
   color: #F3F2F1;
 }
 
-p, span, div, .body-regular {
-  font-weight: 400;              /* Regular */
+p,
+span,
+div,
+.body-regular {
+  font-weight: 400;
+  /* Regular */
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -175,6 +225,7 @@ p, span, div, .body-regular {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -186,6 +237,7 @@ p, span, div, .body-regular {
   0% {
     background-position: -200px 0;
   }
+
   100% {
     background-position: 200px 0;
   }
@@ -197,6 +249,7 @@ p, span, div, .body-regular {
     transform: scaleY(0);
     opacity: 0;
   }
+
   to {
     transform: scaleY(1);
     opacity: 1;
@@ -216,36 +269,50 @@ p, span, div, .body-regular {
 }
 
 /* Staggered list reveals */
-.stagger-fade > * {
+.stagger-fade>* {
   animation: fluentFadeInUp 0.2s cubic-bezier(0.1, 0.9, 0.2, 1) both;
 }
-.stagger-fade > *:nth-child(1)  { animation-delay: 0.02s; }
-.stagger-fade > *:nth-child(2)  { animation-delay: 0.05s; }
-.stagger-fade > *:nth-child(3)  { animation-delay: 0.08s; }
-.stagger-fade > *:nth-child(4)  { animation-delay: 0.11s; }
-.stagger-fade > *:nth-child(5)  { animation-delay: 0.14s; }
-.stagger-fade > *:nth-child(6)  { animation-delay: 0.17s; }
+
+.stagger-fade>*:nth-child(1) {
+  animation-delay: 0.02s;
+}
+
+.stagger-fade>*:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.stagger-fade>*:nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.stagger-fade>*:nth-child(4) {
+  animation-delay: 0.11s;
+}
+
+.stagger-fade>*:nth-child(5) {
+  animation-delay: 0.14s;
+}
+
+.stagger-fade>*:nth-child(6) {
+  animation-delay: 0.17s;
+}
 
 /* Fluent Skeleton Shimmer Placeholder */
 .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    #E1DFDD 25%,
-    #F3F2F1 50%,
-    #E1DFDD 75%
-  );
+  background: linear-gradient(90deg,
+      #E1DFDD 25%,
+      #F3F2F1 50%,
+      #E1DFDD 75%);
   background-size: 400px 100%;
   animation: fluentShimmer 1.4s ease-in-out infinite;
   border-radius: 4px;
 }
 
 .dark .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    #E1DFDD 25%,
-    #F3F2F1 50%,
-    #E1DFDD 75%
-  );
+  background: linear-gradient(90deg,
+      #E1DFDD 25%,
+      #F3F2F1 50%,
+      #E1DFDD 75%);
   background-size: 400px 100%;
   animation: fluentShimmer 1.4s ease-in-out infinite;
 }
@@ -258,6 +325,7 @@ p, span, div, .body-regular {
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.03), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.02);
   transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
+
 .dark .fluent-card {
   background-color: #252423;
   border-color: #3B3A39;
@@ -267,11 +335,13 @@ p, span, div, .body-regular {
 .fluent-card-interactive {
   cursor: pointer;
 }
+
 .fluent-card-interactive:hover {
   background-color: #FAF9F8;
   border-color: #D2D0CE;
   box-shadow: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.08), 0 1.2px 3.6px 0 rgba(0, 0, 0, 0.04);
 }
+
 .dark .fluent-card-interactive:hover {
   background-color: #2D2C2B;
   border-color: #484644;
@@ -292,10 +362,12 @@ p, span, div, .body-regular {
   font-weight: 600;
   transition: background-color 0.12s ease, box-shadow 0.12s ease;
 }
+
 .fluent-btn-primary:hover {
   background-color: #0078D4;
   box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.06);
 }
+
 .fluent-btn-primary:active {
   background-color: #005A9E;
 }
@@ -312,13 +384,23 @@ p, span, div, .body-regular {
 }
 
 /* ─── SCROLLBARS ──────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #F3F2F1; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F3F2F1;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #C8C6C4;
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover { background: #A19F9D; }
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A19F9D;
+}
 
 /* ─── RECHARTS OVERRIDES ──────────────────────────────────────────────────── */
 .recharts-cartesian-grid-horizontal line,
