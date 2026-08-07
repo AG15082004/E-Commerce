@@ -98,194 +98,7 @@ async function fetchAllChunks(op: any): Promise<any[]> {
   return rows
 }
 
-// ─── Seeded PRNG (mulberry32) for deterministic mock data ─────────────────────
-function createSeededRandom(seed: number) {
-  let state = seed | 0
-  return function seededRandom(): number {
-    state = (state + 0x6D2B79F5) | 0
-    let t = Math.imul(state ^ (state >>> 15), 1 | state)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
 
-// ─── Rich mock fallback ───────────────────────────────────────────────────────
-function generateMockMLData(): MLCache {
-  // Use a fixed seed so mock data is identical across server restarts
-  const rand = createSeededRandom(42)
-
-  const names = [
-    "Aarav Mehta", "Priya Sharma", "Rohan Gupta", "Sneha Iyer", "Vikram Nair",
-    "Ananya Reddy", "Karan Patel", "Divya Joshi", "Amit Singh", "Neha Agarwal",
-    "Rahul Verma", "Pooja Rao", "Suresh Kumar", "Meera Pillai", "Aditya Chopra",
-    "Kavya Nambiar", "Arjun Bhat", "Shreya Menon", "Dev Malhotra", "Ritu Saxena",
-    "Sanjay Dubey", "Ankita Tiwari", "Nikhil Choudhary", "Pallavi Desai", "Varun Shah",
-    "Tanvi Kulkarni", "Harsh Srivastava", "Deepika Krishnan", "Manish Mishra", "Preeti Garg",
-  ]
-  const states = ["Maharashtra", "Karnataka", "Delhi", "Tamil Nadu", "Gujarat", "Rajasthan", "West Bengal", "Telangana"]
-  const cities = ["Mumbai", "Bangalore", "Delhi", "Chennai", "Ahmedabad", "Jaipur", "Kolkata", "Hyderabad"]
-  const products = [
-    "Premium Wireless Headphones", "Smart Fitness Watch", "4K Ultra OLED TV",
-    "Gaming Laptop Pro", "Bluetooth Speaker Portable", "Robot Vacuum Cleaner",
-    "Air Purifier HEPA", "Noise Cancelling Earbuds", "Smart Home Hub",
-    "Electric Standing Desk", "UHD Monitor 27\"", "Mechanical Gaming Keyboard",
-    "Ergonomic Office Chair", "Coffee Maker Smart", "Instant Pot XL",
-    "Dash Cam 4K", "Action Camera Pro", "Projector 4K Home", "NAS Storage 8TB", "Tablet Pro 12.9\""
-  ]
-  const brands = ["Samsung", "Sony", "Apple", "LG", "Philips", "Bosch", "JBL", "Dell", "HP", "Xiaomi"]
-  const categories = ["Electronics", "Home Appliances", "Computers", "Audio", "Smart Home", "Furniture", "Kitchen", "Cameras", "Storage", "Tablets"]
-
-  // Use a fixed base date so prediction dates are stable
-  const baseDate = new Date("2026-08-05T00:00:00Z")
-
-  // Customer Segments
-  const customerSegments: CustomerSegment[] = names.map((name, i) => ({
-    customer_id: `CUST-${1000 + i}`,
-    customer_name: name,
-    segment: i < 6 ? "VIP" : i < 15 ? "Regular" : i < 22 ? "New" : "At Risk",
-    total_revenue: i < 6 ? 150000 + rand() * 300000 : i < 15 ? 30000 + rand() * 80000 : 5000 + rand() * 20000,
-    total_orders: i < 6 ? 40 + Math.floor(rand() * 60) : i < 15 ? 10 + Math.floor(rand() * 25) : 1 + Math.floor(rand() * 8),
-    avg_order_value: i < 6 ? 4500 + rand() * 3000 : 2000 + rand() * 2000,
-    purchase_frequency: i < 6 ? 4 + rand() * 3 : 1 + rand() * 2,
-    state: states[i % states.length],
-    city: cities[i % cities.length],
-    prediction_date: new Date(baseDate.getTime() - rand() * 7 * 86400000).toISOString().split("T")[0],
-  }))
-
-  // Churn Predictions (50 customers)
-  // Ranges are tightened so High (i<8) stays clearly >=0.7
-  // and Medium (i=8..19) stays clearly in 0.4-0.65 (below 0.7 threshold)
-  const churnNames = [
-    ...names,
-    "Vaibhav Sharma", "Nisha Gupta", "Rohit Patel", "Swati Mishra", "Gaurav Yadav",
-    "Bhavna Jain", "Aakash Mehrotra", "Seema Kapoor", "Nitin Thakur", "Lakshmi Venkat",
-    "Shubham Tiwari", "Ravi Shankar", "Prashant Dubey", "Monika Agarwal", "Deepak Chandra",
-    "Sunita Verma", "Kishore Kumar", "Nandini Rao", "Abhishek Soni", "Pooja Malhotra",
-  ]
-  const churnPredictions: ChurnPrediction[] = churnNames.map((name, i) => {
-    const prob = i < 8 ? 0.75 + rand() * 0.24 : i < 20 ? 0.40 + rand() * 0.25 : 0.10 + rand() * 0.25
-    return {
-      customer_id: `CUST-${2000 + i}`,
-      customer_name: name,
-      churn_probability: parseFloat(prob.toFixed(3)),
-      risk_level: prob >= 0.7 ? "High" : prob >= 0.4 ? "Medium" : "Low",
-      prediction_date: new Date(baseDate.getTime() - rand() * 5 * 86400000).toISOString().split("T")[0],
-      model_version: "v2.4.1",
-      state: states[i % states.length],
-      city: cities[i % cities.length],
-    }
-  })
-
-  // CLV Predictions
-  const clvPredictions: CLVPrediction[] = names.map((name, i) => ({
-    customer_id: `CUST-${1000 + i}`,
-    customer_name: name,
-    predicted_clv: i < 5 ? 500000 + rand() * 500000 : i < 12 ? 100000 + rand() * 200000 : i < 22 ? 30000 + rand() * 70000 : 5000 + rand() * 25000,
-    clv_tier: i < 5 ? "Platinum" : i < 12 ? "Gold" : i < 22 ? "Silver" : "Bronze",
-    current_revenue: i < 5 ? 300000 + rand() * 200000 : 20000 + rand() * 100000,
-    prediction_date: new Date(baseDate.getTime() - rand() * 7 * 86400000).toISOString().split("T")[0],
-    model_version: "v1.8.3",
-    state: states[i % states.length],
-    city: cities[i % cities.length],
-  }))
-
-  // Product Recommendations
-  const productCategories: Record<string, string> = {
-    "Premium Wireless Headphones": "Audio",
-    "Smart Fitness Watch": "Smart Home",
-    "4K Ultra OLED TV": "Electronics",
-    "Gaming Laptop Pro": "Computers",
-    "Bluetooth Speaker Portable": "Audio",
-    "Robot Vacuum Cleaner": "Home Appliances",
-    "Air Purifier HEPA": "Home Appliances",
-    "Noise Cancelling Earbuds": "Audio",
-    "Smart Home Hub": "Smart Home",
-    "Electric Standing Desk": "Furniture",
-    "UHD Monitor 27\"": "Computers",
-    "Mechanical Gaming Keyboard": "Computers",
-    "Ergonomic Office Chair": "Furniture",
-    "Coffee Maker Smart": "Kitchen",
-    "Instant Pot XL": "Kitchen",
-    "Dash Cam 4K": "Electronics",
-    "Action Camera Pro": "Cameras",
-    "Projector 4K Home": "Electronics",
-    "NAS Storage 8TB": "Computers",
-    "Tablet Pro 12.9\"": "Tablets"
-  }
-
-  const productRecommendations: ProductRecommendation[] = []
-  names.slice(0, 20).forEach((name, ci) => {
-    for (let r = 1; r <= 3; r++) {
-      const pi = (ci * 3 + r - 1) % products.length
-      const pName = products[pi]
-      productRecommendations.push({
-        customer_id: `CUST-${1000 + ci}`,
-        customer_name: name,
-        product_id: `PROD-${100 + pi}`,
-        product_name: pName,
-        brand: brands[pi % brands.length],
-        category: productCategories[pName] || "Electronics",
-        recommendation_score: parseFloat((0.65 + rand() * 0.34).toFixed(3)),
-        recommendation_rank: r,
-        prediction_date: new Date(baseDate.getTime() - rand() * 3 * 86400000).toISOString().split("T")[0],
-      })
-    }
-  })
-
-  // Product Affinities (heatmap data)
-  // Use deterministic scores: hardcoded high-affinity pairs + seeded random for others
-  const affinityProducts = ["4K TV", "Laptop", "Headphones", "Speaker", "Smart Watch", "Tablet", "Camera", "Gaming Console"]
-  const productAffinities: ProductAffinity[] = []
-  affinityProducts.forEach((src, si) => {
-    affinityProducts.forEach((rec, ri) => {
-      if (si !== ri) {
-        const score = si === 0 && ri === 3 ? 0.87 :
-                      si === 1 && ri === 2 ? 0.82 :
-                      si === 4 && ri === 0 ? 0.78 :
-                      parseFloat((0.1 + rand() * 0.55).toFixed(2))
-        productAffinities.push({
-          source_product: src,
-          recommended_product: rec,
-          source_category: categories[si % categories.length],
-          recommended_category: categories[ri % categories.length],
-          affinity_score: score,
-          co_purchase_count: Math.floor(score * 500 + rand() * 100),
-        })
-      }
-    })
-  })
-
-  // Sales Forecast (30 days)
-  const salesForecast: SalesForecast[] = []
-  let baseRevenue = 280000
-  for (let d = 0; d < 30; d++) {
-    const forecastDate = new Date(baseDate)
-    forecastDate.setDate(baseDate.getDate() + d)
-    const trend = 1 + d * 0.008
-    const noise = (rand() - 0.4) * 30000
-    const predicted = Math.max(200000, baseRevenue * trend + noise)
-    const variance = predicted * 0.12
-    salesForecast.push({
-      forecast_date: forecastDate.toISOString().split("T")[0],
-      predicted_revenue: Math.round(predicted),
-      lower_bound: Math.round(predicted - variance),
-      upper_bound: Math.round(predicted + variance),
-      model_version: "v3.1.0",
-      mae: 18500,
-      mape: 6.4,
-    })
-    baseRevenue = predicted
-  }
-
-  return {
-    customerSegments,
-    churnPredictions,
-    clvPredictions,
-    productRecommendations,
-    productAffinities,
-    salesForecast,
-  }
-}
 
 // ─── Main loader ──────────────────────────────────────────────────────────────
 export async function loadMLData(force = false): Promise<MLCache> {
@@ -293,9 +106,15 @@ export async function loadMLData(force = false): Promise<MLCache> {
   const isStale = mlCacheLoadedAt === 0 || (now - mlCacheLoadedAt > 5 * 60 * 1000)
   if (mlCache && !force && !isStale) return mlCache
   if (mlLoading) {
-    // Wait briefly then return mock
     await new Promise(r => setTimeout(r, 100))
-    return mlCache || generateMockMLData()
+    return mlCache || {
+      customerSegments: [],
+      churnPredictions: [],
+      clvPredictions: [],
+      productRecommendations: [],
+      productAffinities: [],
+      salesForecast: []
+    }
   }
 
   mlLoading = true
@@ -552,12 +371,19 @@ export async function loadMLData(force = false): Promise<MLCache> {
     await session.close()
     await clientInstance.close()
 
-    // If we got real data, use it; otherwise fall back to mock
+    // If we got real data, use it; otherwise return empty cache
     const hasRealData = segRows.length > 0 || churnRows.length > 0
 
     if (!hasRealData) {
-      console.log("[ML Adapter] ML tables empty — using synthetic mock data.")
-      mlCache = generateMockMLData()
+      console.log("[ML Adapter] ML tables empty.")
+      mlCache = {
+        customerSegments: [],
+        churnPredictions: [],
+        clvPredictions: [],
+        productRecommendations: [],
+        productAffinities: [],
+        salesForecast: []
+      }
     } else {
       mlCache = {
         customerSegments: segRows as CustomerSegment[],
@@ -577,8 +403,15 @@ export async function loadMLData(force = false): Promise<MLCache> {
     console.log(`[ML Adapter] Churn risk distribution:`, riskCounts)
     return mlCache
   } catch (err: any) {
-    console.log(`[ML Adapter] Databricks unavailable (${err.message}) — using synthetic mock data.`)
-    mlCache = generateMockMLData()
+    console.error(`[ML Adapter] Databricks unavailable (${err.message})`)
+    mlCache = {
+      customerSegments: [],
+      churnPredictions: [],
+      clvPredictions: [],
+      productRecommendations: [],
+      productAffinities: [],
+      salesForecast: []
+    }
     mlCacheLoadedAt = Date.now()
     return mlCache
   } finally {

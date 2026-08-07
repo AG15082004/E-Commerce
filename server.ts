@@ -1,7 +1,7 @@
 import express from "express"
 import cors from "cors"
 import { getAnalyticsData } from "./src/utils/analyticsEngine"
-import { loadAllDatabricksData, seedMockAnalyticsData } from "./src/utils/databricksAdapter"
+import { loadAllDatabricksData } from "./src/utils/databricksAdapter"
 import { loadMLData } from "./src/utils/mlAdapter"
 import { executeSQL } from "./src/server/services/databricksConnector"
 
@@ -48,9 +48,7 @@ async function ensureDataLoaded(force = false): Promise<boolean> {
   return false
 }
 
-// Pre-seed mock data immediately so dashboards work from first request
-// even before Databricks finishes connecting (or if it's unavailable)
-seedMockAnalyticsData()
+
 
 // Background startup load — overrides mock data with live Databricks data if available
 ensureDataLoaded().then(success => {
@@ -248,99 +246,7 @@ app.get("/api/ml/sales-forecast", async (req, res) => {
 
 // ─── Databricks Genie Agent Secure Proxy Architecture ───────────────────────
 
-interface TokenCache {
-  accessToken: string
-  expiresAt: number
-}
 
-let cachedToken: TokenCache | null = null
-
-const CLIENT_ID = process.env.DATABRICKS_CLIENT_ID || ""
-const CLIENT_SECRET = process.env.DATABRICKS_CLIENT_SECRET || ""
-const hostUrl = process.env.DATABRICKS_HOST || "https://dbc-76c64d67-a588.cloud.databricks.com"
-const HOST = hostUrl.split("?")[0]
-const orgId = hostUrl.includes("o=") ? hostUrl.split("o=")[1].split("&")[0] : "1758184392151523"
-const ORG_QUERY = `?o=${orgId}`
-const GENIE_SPACE_ID = process.env.DATABRICKS_GENIE_SPACE_ID || "01f18fcd9940115ea585f97f637e086a"
-
-async function getAccessToken(): Promise<string> {
-  if (process.env.DATABRICKS_TOKEN) {
-    return process.env.DATABRICKS_TOKEN
-  }
-  const now = Date.now()
-  if (cachedToken && cachedToken.expiresAt > now + 300 * 1000) {
-    return cachedToken.accessToken
-  }
-
-  console.log("[Databricks OAuth] Exchanging Client Credentials for Access Token...")
-  const tokenUrl = `${HOST}/oidc/v1/token`
-  const authHeader = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64")
-
-  const res = await fetch(tokenUrl, {
-    method: "POST",
-    headers: {
-      "Authorization": `Basic ${authHeader}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: "grant_type=client_credentials&scope=all-apis"
-  })
-
-  if (!res.ok) {
-    const errText = await res.text()
-    throw new Error(`Databricks OAuth token fetch failed (${res.status}): ${errText}`)
-  }
-
-  const data = await res.json() as any
-  const expiresIn = data.expires_in || 3600
-
-  cachedToken = {
-    accessToken: data.access_token,
-    expiresAt: now + (expiresIn * 1000)
-  }
-
-  console.log(`[Databricks OAuth] Token exchange completed. Valid for ${expiresIn}s.`)
-  return cachedToken.accessToken
-}
-
-async function fetchQueryResult(
-  token: string,
-  conversationId: string,
-  messageId: string,
-  attachmentId: string
-) {
-  try {
-    const res = await fetch(
-      `${HOST}/api/2.0/genie/spaces/${GENIE_SPACE_ID}/conversations/${conversationId}/messages/${messageId}/attachments/${attachmentId}/query-result${ORG_QUERY}`,
-      {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    )
-    if (!res.ok) {
-      console.warn(`[Databricks Genie] Query result fetch failed: ${res.statusText}`)
-      return null
-    }
-    const data = await res.json() as any
-    const columns = data.statement_response?.manifest?.schema?.columns?.map((c: any) => c.name) || []
-    let rows: any[] = []
-
-    const dataArray = data.statement_response?.result?.data_array
-    if (Array.isArray(dataArray)) {
-      rows = dataArray.map((row: any[]) => {
-        const obj: any = {}
-        columns.forEach((col: string, idx: number) => {
-          obj[col] = row[idx]
-        })
-        return obj
-      })
-    }
-    return { columns, rows }
-  } catch (err: any) {
-    console.warn(`[Databricks Genie Error] fetchQueryResult failed: ${err.message}`)
-    return null
-  }
-}
 
 import { GenieController } from "./src/server/controllers/genieController"
 

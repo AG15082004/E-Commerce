@@ -315,8 +315,8 @@ export const ProductPerformance: React.FC = () => {
             </Card>
           </div>
 
-          {/* Ratings & Categories & Brands (Return Rates deleted, cols updated to md:grid-cols-3) */}
-          <div className="grid gap-6 md:grid-cols-3">
+          {/* Ratings, Categories, Brands & Return Rates (Restored and laid out in responsive columns) */}
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
             <Card>
               <CardHeader>
                 <CardTitle>Ratings Dist.</CardTitle>
@@ -382,6 +382,33 @@ export const ProductPerformance: React.FC = () => {
                       <YAxis stroke="var(--chart-text)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={(val) => val >= 1000 ? `${(val / 1000).toFixed(0)}K` : val} />
                       <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
                       <Bar dataKey="value" fill="#87A9FF" radius={[4, 4, 0, 0]} name="Units Sold" maxBarSize={25} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Return Rates</CardTitle>
+                <CardDescription>Highest return percentage rate.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[200px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={
+                        data.products.returnRateByProduct
+                          ? [...data.products.returnRateByProduct].sort((a, b) => b.rate - a.rate)
+                          : []
+                      }
+                      margin={{ top: 10, right: 10, left: 15, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--chart-grid)" />
+                      <XAxis dataKey="name" stroke="var(--chart-text)" fontSize={8} tickLine={false} interval={0} angle={-15} textAnchor="end" height={35} />
+                      <YAxis stroke="var(--chart-text)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
+                      <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                      <Bar dataKey="rate" fill="#E81123" radius={[4, 4, 0, 0]} name="Return Rate (%)" maxBarSize={20} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
